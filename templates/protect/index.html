@@ -1,0 +1,10 @@
+{% extends "main.html" %}
+
+{% block content %}
+<h2>Authorized User {{request.user.username}} Page</h2>
+<div>Could contain personal info</div>
+
+
+<button> <a href="sign/logout/">Exit</a> </button>
+<br/>
+{% endblock %}

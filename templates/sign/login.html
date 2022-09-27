@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+{% load i18n %}
+{% block content %}
+<h2> {% trans "Sign In" %} </h2>
+<form method="post" action="{% url 'login' %}">
+{% csrf_token %}
+<table>
+<tr>
+    <td>{{ form.username.label_tag }}</td>
+    <td>{{ form.username }}</td>
+</tr>
+<tr>
+    <td>{{ form.password.label_tag }}</td>
+    <td>{{ form.password }}</td>
+</tr>
+</table>
+
+<input type="submit" value="{% trans 'Sign In' %}">
+</form>
+<button> <a href="/sign/signup"> {% trans "Register" %} </a></button>
+{% endblock %}
