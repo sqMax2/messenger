@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +45,8 @@ INSTALLED_APPS = [
     'authapp',
     'protect',
     'msngr.apps.MsngrConfig',
-    'channels',
+    'rest_framework',
+    'django_filters',
 
 ]
 
@@ -135,6 +137,9 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Data stored in .env
 load_dotenv(dotenv_path='.env/yandex.env')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
@@ -169,11 +174,11 @@ ACCOUNT_FORMS = {'signup': 'authapp.models.BasicSignupForm'}
 ASGI_APPLICATION = "messenger.asgi.application"
 CHANNEL_LAYERS = {
     'default': {
-        #'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [CHANNEL_REDIS_HOST],
-            "symmetric_encryption_keys": [SECRET_KEY],
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #     "hosts": [CHANNEL_REDIS_HOST],
+        #     "symmetric_encryption_keys": [SECRET_KEY],
+        # },
     },
 }
 
@@ -185,3 +190,12 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     ALLOWED_HOSTS = ['*']
 SECURE_HSTS_SECONDS = 300
+
+REST_FRAMEWORK = {
+   'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+   'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+   'PAGE_SIZE': 10,
+   'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
