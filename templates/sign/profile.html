@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+{% block content %}
+<h2> Profile </h2>
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+<table>
+<tr>
+    {% for i in form.username %}
+    <td>{{ i }}</td>
+    {% endfor %}
+    <td>{{ form.user.id }}</td>
+</tr>
+<tr>
+    <td>{{ form.avatar }}</td>
+    <td>{{ form.avatar.value }}</td>
+    <td>{{ form.avatar.path }}</td>
+</tr>
+</table>
+
+<input type="submit" value="Submit">
+</form>
+
+{% endblock %}

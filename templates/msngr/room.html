@@ -11,6 +11,9 @@
     {{ room_name|json_script:"room-name" }}
     {{ username|json_script:'username' }}
     <script>
+        function gotoLogin(){
+            window.location.href = '/';
+        }
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
         const username = JSON.parse(document.getElementById('username').textContent);
 
@@ -24,7 +27,10 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+            if (data.auth) {
+                if (data.auth === 'anon') gotoLogin()
+            }
+            else document.querySelector('#chat-log').value += (data.username +': ' + data.message + '\n');
         };
 
         chatSocket.onclose = function(e) {
@@ -47,6 +53,8 @@
             }));
             messageInputDom.value = '';
         };
+
+
     </script>
 </body>
 </html>

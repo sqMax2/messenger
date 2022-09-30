@@ -5,7 +5,10 @@ WebSocket consumer
 import json
 # from channels.generic.websocket import WebsocketConsumer
 from channels.generic.websocket import AsyncWebsocketConsumer
-# from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync
+from asgiref.sync import sync_to_async
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -21,6 +24,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        # print(await sync_to_async(User.objects.get)(id=self.user.id))
+        try:
+            if await sync_to_async(User.objects.get)(id=self.user.id):
+                await self.send(text_data=json.dumps({
+                    'message': '',
+                    'auth': 'auth',
+                    'username': self.user.username,
+                }))
+        except:
+            await self.send(text_data=json.dumps({
+                'message': '',
+                'auth': 'anon',
+                'username': self.user.username,
+            }))
+            return AnonymousUser()
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -51,11 +69,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         username = event['username']
 
         # Send message to WebSocket
-        print(self.user.username)
-        print(username == self.user.username)
-
-        # check for sending to OTHERS. Disallow se
-        if (username != self.user.username):
+        # check for sending to OTHERS
+        if (username != self.user.username)|True:
             await self.send(text_data=json.dumps({
                 'message': message,
                 'username': username,

@@ -6,11 +6,23 @@
 </head>
 <body>
     What chat room would you like to enter?<br>
-    <input id="room-name-input" type="text" size="100"><br>
+    <label for="room-name-input">Choose a Room:</label>
+    <input list="room-list" id="room-name-input" name="room-name-input" size="100"><br>
+    <datalist id="room-list">
+
+    </datalist>
+
     <input id="room-name-submit" type="button" value="Enter">
 
     <script>
-        document.querySelector('#room-name-input').focus();
+        document.ready(function() {
+            fetch('https://jsonplaceholder.typicode.com/posts')
+            .then(response => response.json())
+            .then(json => console.log(json))
+            console.log('ready');
+
+        })
+        {#document.querySelector('#room-name-input').focus();#}
         document.querySelector('#room-name-input').onkeyup = function(e) {
             if (e.keyCode === 13) {  // enter, return
                 document.querySelector('#room-name-submit').click();

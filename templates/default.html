@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 {% load static %}
-{% load tz %}
 
 <html lang="en">
 
@@ -21,13 +20,12 @@
         </style>
     </head>
     <body>
-    {% load cache %}
-    {% cache 30 navbar %}
+
         <!-- Responsive navbar-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
                 <a class="navbar-brand" href="/">Messenger</a>
-                   <button class="navbar-toggler" type="button" data-toggle="collapse"
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
                            data-target="#navbarResponsive"
                            aria-controls="navbarResponsive" aria-expanded="false"
                            aria-label="Toggle navigation">
@@ -36,10 +34,10 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item active">
-                            <a class="nav-link" aria-current="page" href="/posts/">Posts</a>
+                            <a class="nav-link" aria-current="page" href="/chat/">Chat Rooms</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/messages/">Messages</a>
+                            <a class="nav-link" href="/sign/profile/">Profile</a>
                         </li>
 <!--                        <li class="nav-item">-->
 <!--                            <a class="nav-link" href="/alternative/">Другое</a>-->
@@ -48,8 +46,6 @@
                 </div>
             </div>
         </nav>
-    {% endcache %}
-
 
 
         <!-- Page content-->
