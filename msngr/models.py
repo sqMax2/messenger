@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from annoying.fields import AutoOneToOneField
 from django.db.models import signals
 
 
@@ -15,9 +14,25 @@ signals.post_save.connect(create_member, sender=User, weak=False,
                           dispatch_uid='models.create_member')
 
 
-class GroupChat(models.Model):
+class Room(models.Model):
     name = models.CharField(max_length=64, unique=True, help_text='Room name')
-    # members = models.ManyToManyField(User, related_name='rooms')
+    online = models.ManyToManyField(User, related_name='rooms')
+
+    @property
+    def get_online_count(self):
+        return self.online.count()
+
+    def join(self, user):
+        self.online.add(user)
+        self.save()
+
+    def leave(self, user):
+        self.online.remove(user)
+        self.save()
+
+    def __str__(self):
+        return f'{self.name} ({self.get_online_count})'
+
 
 
 class Member(models.Model):

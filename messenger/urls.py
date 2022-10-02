@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from msngr.views import UserViewset, GroupChatViewset, MemberViewset
+from msngr.views import UserViewset, RoomViewset, MemberViewset
 from django.contrib.auth.views import LogoutView
 from django.conf.urls.static import static
 from django.conf import settings
@@ -24,7 +24,7 @@ from django.conf import settings
 
 # REST
 router = routers.DefaultRouter()
-router.register(r'group', GroupChatViewset)
+router.register(r'room', RoomViewset)
 router.register(r'user', UserViewset)
 router.register(r'member', MemberViewset)
 

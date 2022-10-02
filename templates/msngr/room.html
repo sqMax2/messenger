@@ -3,17 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat Room</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static '/css/styles.css' %}">
 </head>
 <body>
-    <textarea id="chat-log" cols="100" rows="20" readonly="true"></textarea><br>
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
     {{ username|json_script:'username' }}
+    <div class="container mt-3 p-5">
+        <h2>Room {{ room_name }}</h2>
+        <textarea id="chat-log" cols="100" rows="20" readonly="true"></textarea><br>
+        <input id="chat-message-input" type="text" size="100"><br>
+        <input id="chat-message-submit" type="button" value="Send"><br>
+        <input id="chat-leave" type="button" value="Leave"><br>
+        <input id="chat-delete" type="button" value="Delete Room" style="margin-top: 50px">
+    </div>
+
     <script>
         function gotoLogin(){
             window.location.href = '/';
         }
+
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
         const username = JSON.parse(document.getElementById('username').textContent);
 
@@ -30,7 +39,19 @@
             if (data.auth) {
                 if (data.auth === 'anon') gotoLogin()
             }
-            else document.querySelector('#chat-log').value += (data.username +': ' + data.message + '\n');
+            else {
+                switch (data.type){
+                    case 'delete':
+                        chatSocket.send(JSON.stringify({
+                            'type': 'disconnect',
+                            'message': 'Has left room',
+                            'username': username,
+                            }));
+                        gotoLogin();
+                        break;
+                }
+                document.querySelector('#chat-log').value += (data.username +': ' + data.message + '\n');
+            }
         };
 
         chatSocket.onclose = function(e) {
@@ -53,6 +74,24 @@
             }));
             messageInputDom.value = '';
         };
+
+        document.querySelector('#chat-leave').onclick = function (e) {
+            chatSocket.send(JSON.stringify({
+                'type': 'disconnect',
+                'message': 'Has left room',
+                'username': username,
+            }));
+            gotoLogin();
+        };
+
+        document.querySelector('#chat-delete').onclick = async function (e) {
+            await chatSocket.send(JSON.stringify({
+                'type': 'delete_room',
+                'message': 'Has deleted room',
+                'username': username,
+            }));
+            gotoLogin();
+        }
 
 
     </script>

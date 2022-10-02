@@ -10,6 +10,8 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AnonymousUser
 
+from msngr.models import Room
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -40,12 +42,37 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }))
             return AnonymousUser()
 
+        room_object = await sync_to_async(Room.objects.get)(name=self.room_name)
+        await sync_to_async(room_object.join)(self.user)
+
     async def disconnect(self, close_code):
         # Leave room group
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
+        room_object = await sync_to_async(Room.objects.get)(name=self.room_name)
+        await sync_to_async(room_object.leave)(self.user)
+
+    async def delete_room(self):
+        # Leave room and delete
+        print('room deletion')
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'delete',
+                'message': 'deletes room. Bye',
+                'username': self.user.username,
+            }
+        )
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+        room_object = await sync_to_async(Room.objects.get)(name=self.room_name)
+        await sync_to_async(room_object.delete)()
 
     # Receive message from WebSocket
     async def receive(self, text_data):
@@ -70,7 +97,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         # check for sending to OTHERS
-        if (username != self.user.username)|True:
+        if (username != self.user.username) | True:
             await self.send(text_data=json.dumps({
                 'message': message,
                 'username': username,

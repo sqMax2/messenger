@@ -7,10 +7,26 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 
 
-class GroupChatSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = GroupChat
-        fields = ['name']
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'last_login', 'date_joined',
+                  'member']
+
+
+class RoomSerializer(serializers.HyperlinkedModelSerializer):
+    online = serializers.SlugRelatedField(
+        queryset=User.objects.all(),
+        # read_only=True,
+        many=True,
+        slug_field='username'
+    )
+    # online = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Room
+        fields = ['name', 'online', 'get_online_count']
+        # depth = 1
 
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
@@ -21,7 +37,6 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['user', 'avatar']
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'last_login', 'date_joined', 'member']
+# class RoomUserSerializer(serializers.HyperlinkedModelSerializer):
+#     class Meta:
+#         model = Member
