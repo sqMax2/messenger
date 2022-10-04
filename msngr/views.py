@@ -22,6 +22,7 @@ def room(request, room_name):
 
 
 class RoomViewset(viewsets.ModelViewSet):
+    lookup_field = 'name'
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
 
@@ -42,6 +43,7 @@ class MemberViewset(viewsets.ModelViewSet):
 
 
 class UserViewset(viewsets.ModelViewSet):
+    lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]

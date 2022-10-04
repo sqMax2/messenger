@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat Room</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static '/css/styles.css' %}">
-</head>
-<body>
+{% extends 'default.html' %}
+{% load static %}
+{% block title %}
+    Chat Room
+{% endblock title %}
+<link rel="stylesheet" href="{% static '/css/styles.css' %}">
+{% block content %}
     {{ room_name|json_script:"room-name" }}
     {{ username|json_script:'username' }}
     <div class="container mt-3 p-5">
@@ -18,82 +16,6 @@
         <input id="chat-delete" type="button" value="Delete Room" style="margin-top: 50px">
     </div>
 
-    <script>
-        function gotoLogin(){
-            window.location.href = '/';
-        }
-
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
-        const username = JSON.parse(document.getElementById('username').textContent);
-
-        const chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/chat/'
-            + roomName
-            + '/'
-        );
-
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            if (data.auth) {
-                if (data.auth === 'anon') gotoLogin()
-            }
-            else {
-                switch (data.type){
-                    case 'delete':
-                        chatSocket.send(JSON.stringify({
-                            'type': 'disconnect',
-                            'message': 'Has left room',
-                            'username': username,
-                            }));
-                        gotoLogin();
-                        break;
-                }
-                document.querySelector('#chat-log').value += (data.username +': ' + data.message + '\n');
-            }
-        };
-
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-
-        document.querySelector('#chat-message-input').focus();
-        document.querySelector('#chat-message-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {  // enter, return
-                document.querySelector('#chat-message-submit').click();
-            }
-        };
-
-        document.querySelector('#chat-message-submit').onclick = function(e) {
-            const messageInputDom = document.querySelector('#chat-message-input');
-            const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'username': username,
-            }));
-            messageInputDom.value = '';
-        };
-
-        document.querySelector('#chat-leave').onclick = function (e) {
-            chatSocket.send(JSON.stringify({
-                'type': 'disconnect',
-                'message': 'Has left room',
-                'username': username,
-            }));
-            gotoLogin();
-        };
-
-        document.querySelector('#chat-delete').onclick = async function (e) {
-            await chatSocket.send(JSON.stringify({
-                'type': 'delete_room',
-                'message': 'Has deleted room',
-                'username': username,
-            }));
-            gotoLogin();
-        }
-
-
+    <script src="{% static 'msngr/room.js' %}">
     </script>
-</body>
-</html>
+{% endblock content %}
