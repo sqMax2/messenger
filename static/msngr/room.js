@@ -1,4 +1,4 @@
-import {getCookie} from "./common";
+import {getCookie} from "./common.js";
 
 const csrftoken = getCookie('csrftoken');
 
@@ -17,10 +17,19 @@ const chatSocket = new WebSocket(
     + '/'
 );
 
-chatSocket.onmessage = function(e) {
+chatSocket.onmessage = async function(e) {
     const data = JSON.parse(e.data);
     if (data.auth) {
         if (data.auth === 'anon') gotoLogin()
+        else await fetch(`/room/${roomName}/join/`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({})
+        }).then(response => response.json())
+          .then(json => console.log('json: ', json));
     }
     else {
         switch (data.type){
@@ -58,12 +67,21 @@ document.querySelector('#chat-message-submit').onclick = function(e) {
     messageInputDom.value = '';
 };
 
-document.querySelector('#chat-leave').onclick = function (e) {
+document.querySelector('#chat-leave').onclick = async function (e) {
     chatSocket.send(JSON.stringify({
         'type': 'disconnect',
         'message': 'Has left room',
         'username': username,
     }));
+    await fetch(`/room/${roomName}/leave/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({})
+    }).then(response => response.json())
+      .then(json => console.log('json: ', json));
     gotoLogin();
 };
 

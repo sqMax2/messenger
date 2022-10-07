@@ -1,4 +1,4 @@
-import {getCookie} from "./common";
+import {getCookie} from "./common.js";
 var roomList = [];
 
 const csrftoken = getCookie('csrftoken');
@@ -25,6 +25,7 @@ document.querySelector('#room-name-input').onkeyup = function(e) {
     }
 };
 
+document.querySelector('#room-name-input').focus();
 document.querySelector('#room-name-input').onkeypress = function(e) {
     const char = String.fromCharCode(e.charCode);
     console.log(e);
@@ -49,7 +50,7 @@ document.querySelector('#room-name-submit').onclick = async function(e) {
               'Content-Type': 'application/json',
               'X-CSRFToken': csrftoken
             },
-            body: JSON.stringify({name: roomName})
+            body: JSON.stringify({name: roomName, online: []})
         })
             .then(response => response.json())
             .then(json => console.log('json: ', json));

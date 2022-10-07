@@ -42,9 +42,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }))
             return AnonymousUser()
 
-        room_object = await sync_to_async(Room.objects.get)(name=self.room_name)
-        await sync_to_async(room_object.join)(self.user)
-
     async def disconnect(self, close_code):
         # Leave room group
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -52,8 +49,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        room_object = await sync_to_async(Room.objects.get)(name=self.room_name)
-        await sync_to_async(room_object.leave)(self.user)
 
     async def delete_room(self):
         # Leave room and delete
@@ -71,8 +66,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        room_object = await sync_to_async(Room.objects.get)(name=self.room_name)
-        await sync_to_async(room_object.delete)()
+        # room_object = await sync_to_async(Room.objects.get)(name=self.room_name)
+        # await sync_to_async(room_object.delete)()
 
     # Receive message from WebSocket
     async def receive(self, text_data):
