@@ -18,6 +18,7 @@
         <style>
         body {background-color: {% if current_time.hour >= 19 or current_time.hour <= 7 %} #a19b97 {% else %} whitesmoke {% endif %};}
         </style>
+        {% block head %} {% endblock head %}
     </head>
     <body>
 

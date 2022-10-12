@@ -1,5 +1,7 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from django.views.generic import UpdateView
 from django.views.generic.edit import CreateView
 
 from msngr.models import Member
@@ -12,6 +14,32 @@ class BaseRegisterView(CreateView):
     success_url = '/'
 
 
-class ProfileView(CreateView):
+class ProfileView(LoginRequiredMixin, UpdateView):
     model = Member
     form_class = ProfileForm
+
+    def get_object(self, queryset=None):
+        return self.request.user.member
+
+    def get_initial(self):
+        initial = super(ProfileView, self).get_initial()
+        initial['username'] = self.request.user.username
+        return initial
+
+    # def get_context_data(self, **kwargs):
+    #     form = self.form_class(self.request.GET)
+    #     form.fields['username'].initial = self.request.user.username
+    #     print(form.fields['username'].__dict__)
+    #     return super(ProfileView, self).get_context_data(**kwargs)
+    # def form_valid(self, form):
+    #     response = super(ProfileView, self).form_valid(form)
+    #     form.instance.user.username = form.cleaned_data['username']
+    #     print(form.cleaned_data)
+    #     form.instance.user.save()
+    #     return response
+    def post(self, request, *args, **kwargs):
+        user = self.get_object().user
+        user.username = request._post['username']
+        user.save()
+
+        return super().post(request, *args, **kwargs)

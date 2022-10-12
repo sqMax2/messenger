@@ -9,11 +9,20 @@
     {{ username|json_script:'username' }}
     <div class="container mt-3 p-5">
         <h2>Room {{ room_name }}</h2>
-        <textarea id="chat-log" cols="100" rows="20" readonly="true"></textarea><br>
-        <input id="chat-message-input" type="text" size="100"><br>
-        <input id="chat-message-submit" type="button" value="Send"><br>
-        <input id="chat-leave" type="button" value="Leave"><br>
-        <input id="chat-delete" type="button" value="Delete Room" style="margin-top: 50px">
+        <div class="row">
+            <div class="col-12 col-md-8">
+                <textarea id="chat-log" cols="100" rows="20" readonly="true" contenteditable="true"></textarea><br>
+                <input id="chat-message-input" type="text" size="100"><br>
+                <input id="chat-message-submit" type="button" value="Send"><br>
+                <input id="chat-leave" type="button" value="Leave"><br>
+                <input id="chat-delete" type="button" value="Delete Room" style="margin-top: 50px">
+            </div>
+            <div class="col-12 col-md-4">
+                <label for="onlineUsers">Online users</label>
+                <select multiple class="form-control" id="onlineUsersSelector">
+                </select>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="{% static 'msngr/room.js' %}">

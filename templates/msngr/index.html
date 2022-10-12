@@ -3,14 +3,21 @@
 {% block title %}
     Chat rooms
 {% endblock title %}
+{% block head %}
+<style>
+input:invalid {
+    color: red;
+}
+</style>
+{% endblock head %}
 {% block content %}
     What chat room would you like to enter?<br>
     <label for="room-name-input">Choose a Room:</label>
-    <input list="room-list" id="room-name-input" name="room-name-input"
-           placeholder="Latin characters, numbers and understroke only starts with letter" size="100"><br>
+    <input list="room-list" id="room-name-input" name="room-name-input" required pattern="[A-Za-z]{1}[A-Za-z0-9_]*"
+           placeholder="Latin characters, numbers and understroke only, starts with letter. Max 20 chars long " size="100" maxlength="20"><br>
     <datalist id="room-list"></datalist>
 
-    <input id="room-name-submit" type="button" value="Enter">
+    <input id="room-name-submit" type="button" value="Enter" disabled="true">
 
     <script type="module" src="{%  static 'msngr/index.js' %}">
 

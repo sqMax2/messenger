@@ -9,7 +9,7 @@ class RoomAdmin(ModelAdmin):
 
 
 class MemberAdmin(ModelAdmin):
-    list_display = ['user', 'avatar', ]
+    list_display = [field.name for field in Member._meta.get_fields()]
 
 
 admin.site.register(Room, RoomAdmin)

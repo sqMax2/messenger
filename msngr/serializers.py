@@ -14,9 +14,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'url', 'email', 'first_name', 'last_name', 'is_staff', 'last_login', 'date_joined',
-                  'member']
-        extra_kwargs = {'url': {'lookup_field': 'username'}}
+        fields = ['id', 'username', 'url', 'email', 'first_name', 'last_name', 'is_staff', 'last_login', 'date_joined']#,
+                  # 'member']
+        # extra_kwargs = {'url': {'lookup_field': 'username'}}
 
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
@@ -48,16 +48,15 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='member-detail', lookup_field='pk')
+    url = serializers.HyperlinkedIdentityField(view_name='member-detail', lookup_field='user')
     user_url = serializers.SerializerMethodField()
-    user = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='username')
-    # user = UserSerializer()
+    user = serializers.StringRelatedField()
     pk = serializers.PrimaryKeyRelatedField(queryset=Member.objects.all())
-
-    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    # user = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Member
         fields = ['pk', 'user', 'user_url', 'avatar', 'url']
+        # extra_kwargs = {'url': {'lookup_field': 'user'}}
 
     def get_user_url(self, obj):
         result = '{}'.format(reverse('user-detail', args=[obj.user.username], request=self.context['request']))

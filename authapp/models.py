@@ -1,4 +1,5 @@
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import User, Group
 from django import forms
 from allauth.account.forms import SignupForm
@@ -35,8 +36,11 @@ class BaseRegisterForm(UserCreationForm):
 
 class ProfileForm(ModelForm):
     avatar = forms.ImageField()
+    username = forms.CharField()
+
+
     class Meta:
-        model = User
+        model = Member
         fields = ['username',
                   'avatar', ]
 
