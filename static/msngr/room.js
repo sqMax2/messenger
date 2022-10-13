@@ -31,8 +31,8 @@ chatSocket.onmessage = async function(e) {
               'X-CSRFToken': csrftoken
             },
             body: JSON.stringify({})
-        }).then(response => response.json())
-          .then(json => {console.log('json: ', json)
+        }).then(async response => response.json())
+          .then(async json => {
           // sends control message to backend
           chatSocket.send(JSON.stringify({
                 'type': 'join',
@@ -43,6 +43,7 @@ chatSocket.onmessage = async function(e) {
     }
     // updates user list if someone join/leave the room
     else {
+        let usr_lib = {};
         switch(data.type) {
             case 'join':
             case 'leave':
@@ -52,34 +53,34 @@ chatSocket.onmessage = async function(e) {
                       'Content-Type': 'application/json',
                       'X-CSRFToken': csrftoken
                     }
-                }).then(response => response.json())
-                  .then(json => {
-                      let usr_lib = {};
-                      for (let usr of json.online) {
-                          console.log(usr)
-                           fetch(`/user/${usr}/`, {
+                })
+                    .then(async response => response.json())
+                    .then(async json => {
+                        for (let usr of json.online) {
+                            await fetch(`/user/${usr}/`, {
                                 method: 'GET',
                                 headers: {
-                                  'Content-Type': 'application/json',
-                                  'X-CSRFToken': csrftoken
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': csrftoken
                                 }
-                          }).then(response => response.json())
-                               .then(json => {
-                                   console.log(json.member)
-                                   fetch(`${json.member}`, {
+                            })
+                                .then(async response => response.json())
+                                .then(async json => {
+                                    await fetch(`${json.member}`, {
                                         method: 'GET',
                                         headers: {
                                           'Content-Type': 'application/json',
                                           'X-CSRFToken': csrftoken
                                         }
-                                   }).then(response => response.json())
-                                       .then(json => {
-                                           usr_lib[`${usr}`] = json.avatar;
-                                       })
-                               })
-                      }
-                      onlineUsersSelectorUpdate(usr_lib);
-                  });
+                                    })
+                                        .then(async response => response.json())
+                                        .then(async json => {
+                                            usr_lib[`${usr}`] = json.avatar;
+                                        })
+                                })
+                        }
+                        await onlineUsersSelectorUpdate(usr_lib);
+                    });
                 break;
             case 'deletion':
                 // handles room deletion message and sends respond
@@ -144,8 +145,9 @@ document.querySelector('#chat-leave').onclick = async function (e) {
           'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({})
-    }).then(response => response.json())
-      .then(json => console.log('json: ', json));
+    })
+        .then(response => response.json())
+        .then(json => console.log('leave json: ', json));
     gotoLogin();
 };
 
@@ -166,23 +168,25 @@ document.querySelector('#chat-delete').onclick = async function (e) {
         },
         body: JSON.stringify({name: roomName})
     }).then(response => response.status)
-      .then(json => console.log('json: ', json));
+      .then(json => console.log('delete json: ', json));
     gotoLogin();
 };
 
 // adds/removes a new option to 'onlineUsersSelector'
-function onlineUsersSelectorUpdate(userArray) {
-    console.log('ua: ', userArray)
+async function onlineUsersSelectorUpdate(userArray) {
+    console.log('uu: ', userArray)
     // if (document.querySelector("option[value='" + value + "']")) return;
     onlineUsersSelector.innerHTML = '';
     for (let item in userArray) {
         console.log('item: ', item, userArray[item])
         let newOption = document.createElement("option");
         newOption.value = item;
-        newOption.innerHTML = `<img src="${userArray[item]}">${item}</img>`;
+        newOption.setAttribute('style', `border-radius: 10px; margin:0.5em; padding-left:2em; background-image:url(${userArray[item]}); background-size:1.5em; background-repeat: no-repeat;`);
+        newOption.innerHTML = `<img src="${userArray[item]}" style="width: 1em; border-radius: 50%;">${item}</img>`;
         onlineUsersSelector.appendChild(newOption);
+        onlineUsersSelector.setAttribute('style',"height: auto;")
     }
-
+// <img src="${userArray[item]}" style="width: 1em; border-radius: 50%;">${item}</img>
 }
 
 onlineUsersSelector.onchange = function() {

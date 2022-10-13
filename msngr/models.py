@@ -37,7 +37,6 @@ class Room(models.Model):
         return f'{self.name} ({self.get_online_count})'
 
 
-
 class Member(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='uploads/')

@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.views.generic import UpdateView
 from django.views.generic.edit import CreateView
@@ -17,6 +17,8 @@ class BaseRegisterView(CreateView):
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = Member
     form_class = ProfileForm
+    template_name = 'sign/profile.html'
+    success_url = '/'
 
     def get_object(self, queryset=None):
         return self.request.user.member
@@ -31,15 +33,12 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     #     form.fields['username'].initial = self.request.user.username
     #     print(form.fields['username'].__dict__)
     #     return super(ProfileView, self).get_context_data(**kwargs)
-    # def form_valid(self, form):
-    #     response = super(ProfileView, self).form_valid(form)
-    #     form.instance.user.username = form.cleaned_data['username']
-    #     print(form.cleaned_data)
-    #     form.instance.user.save()
-    #     return response
+
+    def form_valid(self, form):
+        return super(ProfileView, self).form_valid(form)
+    
     def post(self, request, *args, **kwargs):
         user = self.get_object().user
         user.username = request._post['username']
         user.save()
-
         return super().post(request, *args, **kwargs)

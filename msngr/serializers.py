@@ -11,12 +11,20 @@ from django.contrib.auth.models import User
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='user-detail', lookup_field='username')
+    member = serializers.HyperlinkedRelatedField(view_name='member-detail', queryset=Member.objects.all(), lookup_field='user')
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'url', 'email', 'first_name', 'last_name', 'is_staff', 'last_login', 'date_joined']#,
-                  # 'member']
+        fields = ['id', 'username', 'url', 'email', 'first_name', 'last_name', 'is_staff', 'last_login', 'date_joined',
+                    'member']
         # extra_kwargs = {'url': {'lookup_field': 'username'}}
+
+
+class CommonUserSerializer(UserSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'url', 'member']
+        read_only_fields = ['__all__']
 
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
@@ -53,9 +61,11 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.StringRelatedField()
     pk = serializers.PrimaryKeyRelatedField(queryset=Member.objects.all())
     # user = serializers.PrimaryKeyRelatedField(read_only=True)
+    username = serializers.SlugRelatedField(source='user', slug_field='username', queryset=User.objects.all())
+
     class Meta:
         model = Member
-        fields = ['pk', 'user', 'user_url', 'avatar', 'url']
+        fields = ['pk', 'user', 'user_url', 'avatar', 'url', 'username']
         # extra_kwargs = {'url': {'lookup_field': 'user'}}
 
     def get_user_url(self, obj):
